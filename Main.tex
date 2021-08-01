@@ -1,0 +1,235 @@
+\documentclass[11pt, oneside]{article}
+\usepackage{geometry}
+\geometry{letterpaper}
+\usepackage{graphicx}
+\usepackage{amssymb}
+\usepackage{booktabs}
+\usepackage{float}
+\usepackage[american]{circuitikz}
+\usepackage{multirow}
+
+\newcommand{\tabitem}{~~\llap{\textbullet}~~}
+
+\begin{document}
+
+% Definitions
+\section{Definitions}
+$\omega_c$: Cutoff Frequency\\
+$\omega_{c,h}$: High Cutoff Frequency (Bandpass)\\
+$\omega_{c,l}$: Low Cutoff Frequency (Bandpass)\\
+$\omega_0$: Center Frequency\\
+$B_p$: $\omega_{c,h}-\omega_{c,l}$\\
+$sbd_{dB}$: Stopband Deviation in Decibles\\
+$pbd_{dB}$: Passband Deviation in Decibles\\
+$G_0$: Passband Gain\\
+$F(s)$: Filter Equation\\
+$n$: Filter Order\\
+$k_f$: Scaling Factor for the Cuttoff Frequency\\
+$\Delta$: Difference / Derivative\\
+$x^*$: Complex Conjugate of $x$\\ 
+
+\subsection{Group Delay}
+\[\frac{\Delta p}{\Delta f}\] Where $-180 \leq p \leq 180$ degrees and $f$ in Hertz
+
+%\subsection{Ideal Filters}
+%\subsubsection{Low-Pass}
+%\subsubsection{High-Pass}
+%\subsubsection{Bandpass}
+%\subsubsection{Notch}
+%\subsubsection{Comb}
+%\subsubsection{Allpass}
+
+% Filters
+\section{Analog Filters}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{ccc}
+        \multirow{4}{*}{Narrower Transition $\downarrow$} & \multicolumn{1}{l}{Bessel} & \multirow{4}{*}{$\uparrow$ More Linear Passband Phase}\\
+        & \multicolumn{1}{l}{Butterworth} \\
+        & \multicolumn{1}{l}{Chebyshev} \\
+        & \multicolumn{1}{l}{Elliptic} \\
+\end{tabular}
+\end{table}
+
+%\begin{table}[H]
+%  \centering
+%  \begin{tabular}{lll}
+%    \toprule
+%    \multicolumn{3}{c}{Filter Comparisons} \\[.5\normalbaselineskip]
+%    \bf{Type} & \bf{Pros} & \bf{Cons} \\
+%    \midrule
+%    1.~Bessel\\
+%    \tabitem  & Flat passband phase & Long transition-band\\
+%    2.~Butterworth\\
+%    \tabitem & Easy to implement & `Average' filter\\
+%    \tabitem & Flat passband gain & \\
+%    3.~Chebyshev\\
+%    \tabitem & Short transition-band & Passband ripple\\
+%    4.~Inverse Chebyshev\\
+%    \tabitem & Shorter transition-band than Chebyshev & Difficult to implement\\
+%    \tabitem & Ripple in stopband instead of passband & Rarely used, Elliptic preferred\\
+%    5.~Elliptic\\
+%    \tabitem & Shortest transition-band & Ripple in stopband and passband\\
+%    \bottomrule
+%  \end{tabular}
+%\end{table}
+
+\subsection{Bessel}
+Choose $n$ then create as follows:
+\[ F(s) = \frac{\theta_n(0)}{\theta_n(s)}\]
+\[ \theta_n(x) = \sum_{k=0}^{n} \frac{(2n-k)!}{2^{n-k}k!(n-k)!}x^k \]
+
+%Example: \[ \theta_3(\frac{s}{\omega_c=1}) = \sum_{k=0}^3 \frac{(2(3)-k)!}{2^{3-k}k!(3-k)!}s^k = \frac{6!}{15}s^0+\frac{5!}{15}s^1+\frac{4!}{6}s^2+\frac{3!}{3!}s^3 = s^3 + 6s^2 + 15s + 15\]
+
+\subsection{Butterworth}
+
+%% Add in image of pole locations
+
+Choose $n$ and $G_0$ then create as follows:
+\[ F(s) = \frac{G_0}{B_n(\frac{s}{w_c})}\]
+For even $n$:
+\[ B_n(x) = \prod_{k = 1}^{n/2}x^2 - 2cos(\frac{\pi(2k+n-1)}{2n})x+1\]
+For odd $n$:
+\[ B_n(x) = (x+1)\prod_{k = 1}^{(n-1)/2}x^2 - 2cos(\frac{\pi(2k+n-1)}{2n})x+1\]
+%Example: \[B_3(\frac{s}{\omega_c = 2.5}) = (\frac{s}{2.5}+1)\prod_{k = 1}^{(3-1)/2}(\frac{s}{2.5})^2 - 2cos(\frac{\pi(2(1)+(1)-1)}{2(1)})\frac{s}{2.5}+1 = (\frac{s}{2.5}+1)(\frac{s^2}{2.5^2} + 2\frac{s}{2.5} + 1)\]
+
+\subsubsection{Chebyshev}
+Choose $G_0$, $n$, $\omega_c$, and $pbd_{dB}$ then create as follows:\\
+\[F(s) = \frac{G_0X_n(s)}{V_n(s)}\]
+\[\epsilon = \sqrt{10^{\frac{-pbd_{dB}}{10}}-1}\]
+\[\alpha = \frac{1}{\epsilon}+\sqrt{1+\epsilon^{-2}}\]
+\[A = \frac{\alpha^{\frac{1}{n}} - \alpha^{\frac{-1}{n}}}{2}\]
+\[B =\frac{\alpha^{\frac{1}{n}} + \alpha^{\frac{-1}{n}}}{2} \]
+For even n:
+\[p_k = \omega_c(Acos(\frac{(2k - 1)\pi}{2n})+jBsin(\frac{(2k-1)\pi}{2n}))\]
+\[V_n(s) = \prod_{k = 1}^{n/2} s^2 + s(p_k+p_k^*)+p_kp_k^*\]
+\[X_n(s) = 10^{-pbd_{dB}/20}\prod_{k = 1}^{n/2}p_kp_k^*\]
+For odd n:
+\[p_k = \omega_c(Acos(\frac{k\pi}{n})+jBsin(\frac{k\pi}{n}))\]
+\[V_n(s) = (s+A\omega_c)\prod_{k = 1}^{(n-1)/2} s^2 + s(p_k+p_k^*)+p_kp_k^*\]
+\[X_n(s) = A\omega_c\prod_{k = 1}^{(n-1)/2}p_kp_k^*\]
+Side Note:\\
+Chebyshev Polynomials:
+\[T_n(x) = \left\{
+                \begin{array}{ll}
+                  T_0(x) = 1\\
+                  T_1(x) = x\\
+                  T_{n+1}(x) = 2xT_n(x) - T_{n-1}(x)
+                \end{array}
+              \right. =
+               \left\{
+                \begin{array}{ll}
+                  cos (n cos^{-1}(x)), |x|\leq 1\\
+                  cosh(ncosh^{-1}(x)), x\geq 1\\
+                  -1^ncosh(ncosh^{-1}(-x)),x\leq -1
+                \end{array}
+              \right.\]
+\[|F(s)| = \sqrt{\frac{1}{1+\epsilon^2T_n^2(\frac{\omega}{\omega_c})}}\]
+\subsubsection{Elliptic / Cauer}
+\subsubsection{Inverse Chebyshev / Type II Chebyshev}
+Choose $G_0$, $n$, $\omega_c$, and $sbd_{dB}$ then create as follows:\\
+\[F(s) = \frac{G_0X_n(s)}{V_n(s)}\]
+\[A_s = 10^{\frac{sbd_{dB}}{10}}\]
+\[\epsilon = \sqrt{\frac{A_s}{1-A_s}}\]
+\[u = \frac{sinh^{-1}(\frac{1}{\epsilon})}{n}\]
+\[z_k = j\omega_c sec(\frac{(2k-1)\pi}{2n})\]
+\[p_k = \frac{\omega_c}{sinh(u)sin(\frac{(2k-1)\pi}{2n})+jcosh(u)cos(\frac{(2k-1)\pi}{2n})}\]
+For even n:
+\[V_n(s) = \prod_{k=1}^{k=n/2}s^2+s(p_kp_k^*)+p_kp_k^*\]
+\[X_n(s) = \prod_{k = 1}^{k = n/2}\frac{p_kp_k^*}{z_kz_k^*}(s^2+s(z_k+z_k^*)+z_kz_k^*)\]
+For odd n:
+\[V_n(s) = (s+p_n)\prod_{k=1}^{k=(n-1)/2}s^2+s(p_kp_k^*)+p_kp_k^*\]
+\[X_n(s) =\sqrt{p_np_n^*} \prod_{k = 1}^{k = (n-1)/2}\frac{p_kp_k^*}{z_kz_k^*}(s^2+s(z_k+z_k^*)+z_kz_k^*)\]
+
+\subsection{Filter Transformations}
+
+\subsubsection{Frequency Scaling}
+Replace $s$ with $\frac{s}{k_f}$
+
+\subsubsection{Lowpass to Highpass}
+Replace $s$ with $\frac{1}{s}$
+
+\subsubsection{Lowpass to Bandpass}
+Replace $s$ with $\frac{s^2+\omega_0^2}{B_ps}$
+
+\subsubsection{Lowpass to Bandstop}
+Replace $s$ with $\frac{B_ps}{s^2+\omega_0^2}$
+
+\subsubsection{Lowpass to Notch}
+Notch is synonymous with `Bandstop' and `Band-reject'\\
+Replace $s$ with $\frac{B_ps}{s^2+\omega_0^2}$
+
+\section{Digital Filters}
+
+%Transformations
+\subsection{Bilinear Transformation}
+Transforms any analog filter into a IIR digital filter.  Phase response will differ from the analog version.\\
+Form desired analog filter then replace $s$ as follows: $s = \frac{2}{T}\frac{1-z^{-1}}{1+z^{-1}}$\\
+where T is the sample rate and $z^{-1}$ is the previous data point\\
+
+\subsection{Finite Impulse Response (FIR)}
+No feedback and linear phase\\
+
+
+\subsubsection{Window Method}
+$F(n) = [Window]\times [Impulse\ Type]$\\\\
+\begin{tabular}{|c|c|c|c|c|}\hline
+\bf{Window} & \bf{Peak Sidelobe} & \bf{Main Lobe Width} & \bf{Peak Approximation Error}\\\hline 
+Rectangular & 0 & 0 & 0 \\\hline
+Hanning & 0 & 0 & 0  \\\hline
+Hamming & 0 & 0 & 0  \\\hline
+Blackmann & 0 & 0 & 0  \\\hline
+\end{tabular}
+\\\\\\
+\begin{tabular}{|c|c|}\hline
+\bf{Window} & \bf{Equation}\\\hline 
+Rectangular & 0 \\\hline
+Hanning & $sin^2(\frac{n\pi}{N})$ \\\hline
+Hamming & $0.54 - 0.46 cos(\frac{2\pi n}{N})$ \\\hline
+Blackmann & $0.42 - 0.5 cos(\frac{2\pi n}{N}) + 0.08 cos(\frac{4\pi n}{N})$ \\\hline
+\end{tabular}
+\\\\\\
+\begin{tabular}{|c|c|}\hline
+\bf{Impulse Type} & \bf{Equation}\\\hline 
+Low Pass & $\frac{\omega_c}{\pi}sinc(\frac{n\omega_c}{\pi})$ \\\hline
+High Pass & $sinc(n) - \frac{\omega_c}{\pi}sinc(\frac{n\omega_c}{\pi})$ \\\hline
+Band Pass & $\frac{\omega_{c,h}}{\pi}sinc(\frac{n\omega_{c,h}}{\pi}) - \frac{\omega_{c,l}}{\pi}sinc(\frac{n\omega_{c,l}}{\pi})$ \\\hline
+\end{tabular}
+% $h[k] = \frac{sin(k\omega_c)}{k\pi}$
+
+\section{Implementations}
+\subsection{Passive}
+\subsubsection{Pi Filter}
+\subsubsection{T FIlter}
+\subsection{Active}
+\subsubsection{Sallen-Key}
+$\frac{V_{OUT}}{V_{IN}} = \frac{Z_3Z_4}{Z_1Z_2+Z_3(Z_1+Z_2)+Z_3Z_4}$\\
+For Lowpass: $Z_1, Z_2$ become resistors and $Z_3, Z_4$ become capacitors\\
+For Highpass: $Z_3, Z_4$ become resistors and $Z_1, Z_2$ become capacitors\\
+\begin{figure}[h!]
+  \begin{center}
+	\begin{circuitikz}
+	% operational amplifier
+	\node[op amp, yscale=-1] (opamp) at (6,-0.5) {};
+	% input port to positive op amp input
+	\draw ($(opamp.+)+(-4,0)$) node[left] {$V_{in}$} to[european resistor, l=$Z_1$, o-*] ($(opamp.+)+(-2.5,0)$) node (betweenc) {}
+	to[european resistor, l=$Z_2$, *-*] ($(opamp.+)+(-1,0)$) node (behindc) {}
+	to[short] (opamp.+);
+	% resistor from positive op amp input to ground
+	\draw (behindc) to[european resistor, l_=$Z_4$, *-] ($(behindc)+(0,-2)$) node [ground] {};
+	% positive feedback resistor from the op amp output to the node between the capacitors
+	\draw (betweenc) to[short] ($(betweenc)+(0,1)$) to[european resistor, l=$Z_3$] ($(opamp.out)+(0,1.5)$) to[short] (opamp.out);
+	% negative feedback loop from the op amp output to the negative op amp input
+	\draw (opamp.-) to[short] ($(opamp.-)+(0,-1)$) to[short] ($(opamp.out)+(0,-1.5)$) to[short] (opamp.out);
+	% output port
+	\draw (opamp.out) to[short, *-o]  ($(opamp.out)+(0.5,0)$) node[right] {$V_{out}$};
+	\end{circuitikz}
+    \caption{Sallen-Key Generic}
+  \end{center}
+\end{figure}
+
+\subsubsection{Phase Lead-Lag Compensator}
+
+
+\end{document}
