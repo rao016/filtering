@@ -27,6 +27,7 @@ $n$: Filter Order\\
 $k_f$: Scaling Factor for the Cuttoff Frequency\\
 $\Delta$: Difference / Derivative\\
 $x^*$: Complex Conjugate of $x$\\ 
+$N$: Window Length
 
 \subsection{Group Delay}
 \[\frac{\Delta p}{\Delta f}\] Where $-180 \leq p \leq 180$ degrees and $f$ in Hertz
@@ -171,15 +172,14 @@ where T is the sample rate and $z^{-1}$ is the previous data point\\
 \subsection{Finite Impulse Response (FIR)}
 No feedback and linear phase\\
 
-
 \subsubsection{Window Method}
 $F(n) = [Window]\times [Impulse\ Type]$\\\\
 \begin{tabular}{|c|c|c|c|c|}\hline
-\bf{Window} & \bf{Peak Sidelobe} & \bf{Main Lobe Width} & \bf{Peak Approximation Error}\\\hline 
-Rectangular & 0 & 0 & 0 \\\hline
-Hanning & 0 & 0 & 0  \\\hline
-Hamming & 0 & 0 & 0  \\\hline
-Blackmann & 0 & 0 & 0  \\\hline
+\bf{Window} & \bf{Peak Sidelobe} & \bf{Main Lobe Width} & \bf{Peak Approximation Error} \\\hline
+Rectangular & 0 dB & 2 $\pi / N$ & Large \\\hline
+Hanning & -31.5 dB & 2 $\pi / N$ & Moderate \\\hline
+Hamming & -42.7 dB & 2.2 $\pi / N$ & Small \\\hline
+Blackman & -58.1 dB & 3 $\pi / N$ & Very Small \\\hline
 \end{tabular}
 \\\\\\
 \begin{tabular}{|c|c|}\hline
@@ -201,7 +201,42 @@ Band Pass & $\frac{\omega_{c,h}}{\pi}sinc(\frac{n\omega_{c,h}}{\pi}) - \frac{\om
 \section{Implementations}
 \subsection{Passive}
 \subsubsection{Pi Filter}
+$\frac{V_{OUT}}{V_{IN}}=\frac{}{}$
+\begin{center}
+    \begin{circuitikz} 
+        % Define nodes
+        \draw (0,2) to[short, o-] (1,2) 
+                  to[R, european, l=$Z_1$] (1,0) node[ground]{};
+        \draw (1,2) to[R, european, l=$Z_2$] (4,2);
+        \draw (4,2) to[R, european, l=$Z_3$] (4,0) node[ground]{};
+        \draw (4,2) to[short, -o] (6,2);
+        
+        % Labels
+        \node[left] at (0,2) {Vin};
+        \node[right] at (6,2) {Vout};
+    \end{circuitikz}
+\end{center}
+
 \subsubsection{T FIlter}
+$\frac{V_{OUT}}{V_{IN}}=\frac{}{}$
+\begin{center}
+    \begin{circuitikz}
+        % Draw the series impedances
+        \draw (0,2) to[short, o-] (2,2) 
+                    to[R, european, l=$Z_1$] (4,2) 
+                    to[R, european, l=$Z_2$] (6,2) 
+                    to[short, -o] (8,2);
+
+        % Draw the shunt impedance
+        \draw (4,2) to[R, european, l=$Z_3$] (4,0) node[ground]{};
+
+        % Labels
+        \node[left] at (0,2) {Vin};
+        \node[right] at (8,2) {Vout};
+    \end{circuitikz}
+\end{center}
+
+
 \subsection{Active}
 \subsubsection{Sallen-Key}
 $\frac{V_{OUT}}{V_{IN}} = \frac{Z_3Z_4}{Z_1Z_2+Z_3(Z_1+Z_2)+Z_3Z_4}$\\
@@ -228,8 +263,5 @@ For Highpass: $Z_3, Z_4$ become resistors and $Z_1, Z_2$ become capacitors\\
     \caption{Sallen-Key Generic}
   \end{center}
 \end{figure}
-
-\subsubsection{Phase Lead-Lag Compensator}
-
 
 \end{document}
